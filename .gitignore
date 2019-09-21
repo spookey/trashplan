@@ -1,0 +1,4 @@
+*.ical
+*.pyc
+*.sh
+venv/
