@@ -3,6 +3,8 @@ import click
 import ics
 import requests
 
+CLI_PROG = 'trashplan'
+CLI_VERS = '0.0.1'
 URL_CAL = (
     'https://www.stadtreinigung-leipzig.de/leistungen/'
     'abfallentsorgung/abfallkalender-entsorgungstermine.html'
@@ -18,10 +20,13 @@ def download(lid):
     return None
 
 
-def generate(ical):
+def generate(ical, only_future=False):
     table = {}
-    cal = ics.Calendar(ical)
-    for event in cal.timeline.start_after(arrow.now()):
+    timeline = ics.Calendar(ical).timeline
+    if only_future:
+        timeline = timeline.start_after(arrow.now())
+
+    for event in sorted(timeline):
         name = event.name
         table[name] = table.get(name, [])
         table[name].append(arrow.get(event.begin))
@@ -35,7 +40,7 @@ def process(table, date_format, head_indent, main_indent):
         return '{}{}'.format(' ' * abs(indent), val)
 
     res = []
-    for head, elems in table.items():
+    for head, elems in sorted(table.items()):
         res.append(fmt(head, head_indent))
         res.extend(fmt(elem, main_indent) for elem in elems)
         res.append('')
@@ -43,6 +48,7 @@ def process(table, date_format, head_indent, main_indent):
 
 
 @click.command()
+@click.version_option(prog_name=CLI_PROG, version=CLI_VERS)
 @click.argument(
     'lid', type=int, required=True
 )
@@ -58,13 +64,16 @@ def process(table, date_format, head_indent, main_indent):
     '-mi', '--main-indent', type=int, help='Indentation for content.',
     default=4,
 )
-def main(lid, **fmargs,):
+@click.option(
+    '-of', '--only-future', is_flag=True, help='Include only future dates.',
+)
+def main(lid, only_future, **fmtargs):
     ical = download('x{:d}'.format(lid))
     if not ical:
         click.secho('Could not download calendar file!', fg='red')
         return 1
 
-    result = process(generate(ical), **fmargs)
+    result = process(generate(ical, only_future), **fmtargs)
     click.echo(result)
     return 0
 
