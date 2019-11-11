@@ -1,4 +1,4 @@
 *.ical
 *.pyc
-*.sh
+self.sh
 venv/

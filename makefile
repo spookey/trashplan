@@ -11,13 +11,19 @@ LIB_ICS				:=	$(DIR_VENV)/lib/python$(VER_PY)/site-packages/ics
 LIB_REQUESTS		:=	$(DIR_VENV)/lib/python$(VER_PY)/site-packages/requests
 
 
-FLE_TRASHPLAN		:=	trashplan.py
+SCR_TRASHPLAN		:=	trashplan.py
+
 
 .PHONY: help
 help:
-	@echo "trashplan"
-	@echo "---------"
+	@echo "trashplan makefile"
+	@echo "------------------"
 	@echo
+	@echo "requirements         install requirements"
+	@echo "requirements-dev     install requirements for developing"
+	@echo
+	@echo "sort                 run $(CMD_ISORT) on $(SCR_TRASHPLAN)"
+	@echo "lint                 run $(CMD_PYLINT) on $(SCR_TRASHPLAN)"
 
 
 $(DIR_VENV):
@@ -43,7 +49,7 @@ endef
 
 .PHONY: sort
 sort: requirements-dev
-	$(call _sort,"$(FLE_TRASHPLAN)")
+	$(call _sort,"$(SCR_TRASHPLAN)")
 
 
 define PYLINT_MESSAGE_TEMPLATE
@@ -62,12 +68,12 @@ endef
 
 .PHONY: lint
 lint: requirements-dev
-	$(call _lint,"$(FLE_TRASHPLAN)")
+	$(call _lint,"$(SCR_TRASHPLAN)")
 
 
 
 NHR_LID				:=	13486	# Martin-Luther-Ring 4 - 6
 
 neues-rathaus: requirements
-	$(CMD_PYTHON3) $(FLE_TRASHPLAN) "$(NHR_LID)" \
+	$(CMD_PYTHON3) $(SCR_TRASHPLAN) "$(NHR_LID)" \
 		--only-future
