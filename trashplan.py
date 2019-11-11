@@ -4,7 +4,7 @@ import ics
 import requests
 
 CLI_PROG = 'trashplan'
-CLI_VERS = '0.0.1'
+CLI_VERS = '0.0.2'
 URL_CAL = (
     'https://www.stadtreinigung-leipzig.de/leistungen/'
     'abfallentsorgung/abfallkalender-entsorgungstermine.html'
@@ -15,7 +15,8 @@ def download(lid):
     with requests.get(URL_CAL, params={
             'lid': lid, 'loc': '', 'ical': True,
     }) as req:
-        if req.ok:
+        content_type = req.headers.get('content-type', '')
+        if req.ok and 'text/calendar' in content_type.lower():
             return req.text
     return None
 
@@ -50,34 +51,46 @@ def process(table, date_format, head_indent, main_indent):
 @click.command()
 @click.version_option(prog_name=CLI_PROG, version=CLI_VERS)
 @click.argument(
-    'lid', type=int, required=True
+    'lid', envvar='LID',
+    type=click.IntRange(min=10000, max=999999),
+    required=True
 )
 @click.option(
-    '-df', '--date-format', type=str, help='Custom date format string.',
+    '-df', '--date-format', envvar='DATE_FORMAT',
+    type=click.STRING,
     default='YYYY-MM-DD',
+    help='Custom date format string.',
 )
 @click.option(
-    '-hi', '--head-indent', type=int, help='Indentation for headings.',
+    '-hi', '--head-indent', envvar='HEAD_INDENT',
+    type=click.IntRange(min=0),
     default=0,
+    help='Indentation for headings.',
 )
 @click.option(
-    '-mi', '--main-indent', type=int, help='Indentation for content.',
+    '-mi', '--main-indent', envvar='MAIN_INDENT',
+    type=click.IntRange(min=0),
     default=4,
+    help='Indentation for content.',
 )
 @click.option(
-    '-of', '--only-future', is_flag=True, help='Include only future dates.',
+    '-of', '--only-future', envvar='ONLY_FUTURE',
+    is_flag=True,
+    help='Include only future dates.',
 )
 def main(lid, only_future, **fmtargs):
-    ical = download('x{:d}'.format(lid))
+    ical = download(f'x{lid:d}')
     if not ical:
-        click.secho('Could not download calendar file!', fg='red')
-        return 1
+        click.secho(
+            f'Could not download calendar file for LID "{lid}"!',
+            fg='red'
+        )
+        return
 
     result = process(generate(ical, only_future), **fmtargs)
     click.echo(result)
-    return 0
 
 
 if __name__ == '__main__':
     # pylint: disable=no-value-for-parameter
-    exit(main())
+    main()
