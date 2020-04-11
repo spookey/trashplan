@@ -1,17 +1,19 @@
-CMD_VENV			:=	virtualenv
-DIR_VENV			:=	venv
-VER_PY				:=	3.7
+CMD_VENV		:=	virtualenv
+DIR_VENV		:=	venv
+VER_PY			:=	3.7
 
-CMD_ISORT			:=	$(DIR_VENV)/bin/isort
-CMD_PIP				:=	$(DIR_VENV)/bin/pip$(VER_PY)
-CMD_PYTHON3			:=	$(DIR_VENV)/bin/python$(VER_PY)
-CMD_PYLINT			:=	$(DIR_VENV)/bin/pylint
-LIB_CLICK			:=	$(DIR_VENV)/lib/python$(VER_PY)/site-packages/click
-LIB_ICS				:=	$(DIR_VENV)/lib/python$(VER_PY)/site-packages/ics
-LIB_REQUESTS		:=	$(DIR_VENV)/lib/python$(VER_PY)/site-packages/requests
+CMD_ISORT		:=	$(DIR_VENV)/bin/isort
+CMD_PIP			:=	$(DIR_VENV)/bin/pip$(VER_PY)
+CMD_PYTHON3		:=	$(DIR_VENV)/bin/python$(VER_PY)
+CMD_PYLINT		:=	$(DIR_VENV)/bin/pylint
+
+DIR_SITE		:=	$(DIR_VENV)/lib/python$(VER_PY)/site-packages
+LIB_CLICK		:=	$(DIR_SITE)/click/__init__.py
+LIB_ICS			:=	$(DIR_SITE)/ics/__init__.py
+LIB_REQUESTS	:=	$(DIR_SITE)/requests/__init__.py
 
 
-SCR_TRASHPLAN		:=	trashplan.py
+SCR_TRASHPLAN	:=	trashplan.py
 
 
 .PHONY: help
