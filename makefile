@@ -1,6 +1,6 @@
 CMD_VENV		:=	virtualenv
 DIR_VENV		:=	venv
-VER_PY			:=	3.7
+VER_PY			:=	3.9
 
 CMD_ISORT		:=	$(DIR_VENV)/bin/isort
 CMD_PIP			:=	$(DIR_VENV)/bin/pip$(VER_PY)
@@ -46,7 +46,17 @@ requirements-dev: $(CMD_ISORT) $(CMD_PYLINT)
 
 
 define _sort
-	$(CMD_ISORT) -cs -fss -m=5 -y -rc $(1)
+	$(CMD_ISORT) \
+		--combine-star \
+		--force-sort-within-sections \
+		--py "$(subst .,,$(VER_PY))" \
+		--line-width="79" \
+		--multi-line "VERTICAL_HANGING_INDENT" \
+		--trailing-comma \
+		--force-grid-wrap 0 \
+		--use-parentheses \
+		--ensure-newline-before-comments \
+			$(1)
 endef
 
 .PHONY: sort
