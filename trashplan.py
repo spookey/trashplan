@@ -6,14 +6,14 @@ import requests
 CLI_PROG = 'trashplan'
 CLI_VERS = '0.0.2'
 URL_CAL = (
-    'https://www.stadtreinigung-leipzig.de/leistungen/'
-    'abfallentsorgung/abfallkalender-entsorgungstermine.html'
+    'https://stadtreinigung-leipzig.de/wir-kommen-zu-ihnen/'
+    'abfallkalender/ical.ics'
 )
 
 
-def download(lid):
+def download(nos):
     with requests.get(URL_CAL, params={
-            'lid': lid, 'loc': '', 'ical': True,
+            'position_nos': f'{nos}',
     }) as req:
         content_type = req.headers.get('content-type', '')
         if req.ok and 'text/calendar' in content_type.lower():
@@ -52,7 +52,7 @@ def process(table, date_format, head_indent, main_indent):
 @click.command()
 @click.version_option(prog_name=CLI_PROG, version=CLI_VERS)
 @click.argument(
-    'lid', envvar='LID',
+    'nos', envvar='NOS',
     type=click.IntRange(min=10000, max=999999),
     required=True
 )
@@ -79,17 +79,18 @@ def process(table, date_format, head_indent, main_indent):
     is_flag=True,
     help='Include only future dates.',
 )
-def main(lid, only_future, **fmtargs):
-    ical = download(f'x{lid:d}')
+def main(nos, only_future, **fmtargs):
+    ical = download(nos)
     if not ical:
         click.secho(
-            f'Could not download calendar file for LID "{lid}"!',
+            f'Could not download calendar file for NOS "{nos}"!',
             fg='red'
         )
         return
 
-    result = process(generate(ical, only_future), **fmtargs)
-    click.echo(result)
+    generated = generate(ical, only_future)
+    processed = process(generated, **fmtargs)
+    click.echo(processed)
 
 
 if __name__ == '__main__':

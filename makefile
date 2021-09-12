@@ -91,8 +91,8 @@ lint: requirements-dev
 
 
 
-NHR_LID				:=	13486	# Martin-Luther-Ring 4 - 6
+NHR_NOS				:=	13486	# Martin-Luther-Ring 4 - 6
 
 neues-rathaus: requirements
-	$(CMD_PYTHON3) $(SCR_TRASHPLAN) "$(NHR_LID)" \
+	$(CMD_PYTHON3) $(SCR_TRASHPLAN) "$(NHR_NOS)" \
 		--only-future
