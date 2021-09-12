@@ -38,7 +38,8 @@ def process(table, date_format, head_indent, main_indent):
     def fmt(val, indent=0):
         if isinstance(val, arrow.arrow.Arrow):
             val = val.format(date_format)
-        return '{}{}'.format(' ' * abs(indent), val)
+        ind = ' ' * abs(indent)
+        return f'{ind}{val}'
 
     res = []
     for head, elems in sorted(table.items()):
