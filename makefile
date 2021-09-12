@@ -11,6 +11,7 @@ DIR_SITE		:=	$(DIR_VENV)/lib/python$(VER_PY)/site-packages
 LIB_CLICK		:=	$(DIR_SITE)/click/__init__.py
 LIB_ICS			:=	$(DIR_SITE)/ics/__init__.py
 LIB_REQUESTS	:=	$(DIR_SITE)/requests/__init__.py
+CMD_PUDB		:=	$(DIR_VENV)/bin/pudb
 
 
 SCR_TRASHPLAN	:=	trashplan.py
@@ -30,19 +31,25 @@ help:
 
 $(DIR_VENV):
 	$(CMD_VENV) -p "python$(VER_PY)" "$(DIR_VENV)"
+	$(CMD_PIP) install -U pip
 
 $(LIB_CLICK) $(LIB_ICS) $(LIB_REQUESTS): $(DIR_VENV)
 	$(CMD_PIP) install -r "requirements.txt"
 
-.PHONY: requirements
-requirements: $(LIB_CLICK) $(LIB_ICS) $(LIB_REQUESTS)
-
-
 $(CMD_ISORT) $(CMD_PYLINT): $(DIR_VENV)
 	$(CMD_PIP) install -r "requirements-dev.txt"
 
+$(CMD_PUDB): $(DIR_VENV)
+	$(CMD_PIP) install -r "requirements-dbg.txt"
+
+.PHONY: requirements
+requirements: $(LIB_CLICK) $(LIB_ICS) $(LIB_REQUESTS)
+
 .PHONY: requirements-dev
 requirements-dev: $(CMD_ISORT) $(CMD_PYLINT)
+
+.PHONY: requirements-dbg
+requirements-dbg: $(CMD_PUDB)
 
 
 define _sort
